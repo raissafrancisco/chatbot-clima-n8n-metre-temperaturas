@@ -1,0 +1,125 @@
+services:
+  n8n-editor:
+    image: n8nio/n8n:latest
+    container_name: n8n-editor-r
+    ports:
+      - 5678:5678
+    volumes:
+      - n8n-data:/home/node/.n8n
+    environment:
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+      - TZ=America/Sao_Paulo
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true 
+      - N8N_RUNNERS_ENABLED=true
+
+      - N8N_ENCRYPTION_KEY=INSIRA_SUA_CHAVE_AQUI
+      ## Postgres
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=postgres
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=INSIRA_SUA_CHAVE_AQUI
+      - DB_POSTGRESDB_PASSWORD=INSIRA_SUA_CHAVE_AQUI
+      ## Queue Mode
+      - EXECUTIONS_MODE=queue
+      - QUEUE_BULL_REDIS_HOST=redis
+      - QUEUE_BULL_REDIS_PORT=6379
+      - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
+      ## webhook
+      - WEBHOOK_URL=https://seu-subdominio.ngrok-free.dev
+    networks:
+      - Automações n8n
+    depends_on:
+      - postgres
+      - redis
+    restart: always
+
+  n8n-worker:
+    image: n8nio/n8n:latest
+    container_name: n8n-worker-r
+    user: root
+    command: worker
+    ports:
+      - 5679:5678
+    volumes:
+      - n8n-data:/home/node/.n8n
+    environment:
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+      - TZ=America/Sao_Paulo
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true 
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_ENCRYPTION_KEY=INSIRA_SUA_CHAVE_AQUI
+      ## Postgres
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=postgres
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=INSIRA_SUA_CHAVE_AQUI
+      - DB_POSTGRESDB_PASSWORD=INSIRA_SUA_CHAVE_AQUI
+      ## Queue Mode
+      - EXECUTIONS_MODE=queue
+      - QUEUE_BULL_REDIS_HOST=redis
+      - QUEUE_BULL_REDIS_PORT=6379
+      - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
+      ## Webhook
+      - WEBHOOK_URL=https://seu-subdominio.ngrok-free.dev
+    networks:
+      - Automações n8n
+    depends_on:
+      - postgres
+      - redis
+    restart: always
+
+ 
+  postgres:
+    image: ankane/pgvector
+    container_name: postgres-n8n
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=INSIRA_SUA_CHAVE_AQUI
+      - POSTGRES_DB=INSIRA_SUA_CHAVE_AQUI
+      - POSTGRES_USER=INSIRA_SUA_CHAVE_AQUI
+    networks:
+      - Automações n8n
+    restart: always
+
+  redis:
+    image: redis:alpine
+    container_name: redis-n8n
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-data:/data
+    networks:
+      - Automações n8n
+    restart: always
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok-n8n
+    ports: 
+      - 4040:4040
+    volumes:
+      - ngrok-data:/etc
+    command: http --domain=seu-subdominio.ngrok-free.dev n8n-editor-r:5678
+    environment:
+      - NGROK_AUTHTOKEN=INSIRA_SUA_CHAVE_AQUI
+    restart: always
+    networks:
+      - Automações n8n
+    depends_on:
+      - n8n-editor
+
+
+networks:
+  Automações n8n:
+    driver: bridge
+
+volumes:
+  n8n-data:
+  postgres-data:
+  redis-data:
+  ngrok-data:
