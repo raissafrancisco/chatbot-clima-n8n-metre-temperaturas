@@ -88,4 +88,5 @@ Enviar Mensagem: Envie o nome de uma cidade (Ex: Rio de Janeiro,RJ) para o seu b
 O que esperar: O bot responderá com a previsão no tom místico do Mestre ou solicitará o formato correto em caso de erro.
 
 🧪 Teste de Fallback (Requisito de Avaliação)
+
 Para validar a resiliência: insira uma chave inválida propositalmente no nó do Gemini. O nó Code garantirá a resposta utilizando a lógica de contingência programada com os dados tratados anteriormente.
