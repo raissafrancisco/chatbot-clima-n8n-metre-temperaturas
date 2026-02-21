@@ -14,7 +14,9 @@ Uso de Emojis: Emprega ícones como ⚡, 🔮, 📜 e ✨ para reforçar a atmos
 
 Configuração Sugerida para o Telegram
 Botpic (Avatar):
-![Avatar do Mestre das Temperaturas](avatar-mestre.png)
+<p align="center">
+<img src="avatar-mestre.png.png" alt="Avatar do Mestre das Temperaturas" width="300">
+</p>
 
 Description: Bem-vindo ao santuário do clima! 🔮 Sou o Mestre das temperaturas e recebi o dom de consultar os céus do Brasil pra te ajudar a navegar as 4 estações. Digite o nome da sua cidade e estado e eu revelarei a verdade térmica agora mesmo! 🌡️⚡️
 
@@ -88,4 +90,5 @@ O que esperar: O bot responderá com a previsão no tom místico do Mestre ou so
 🧪 Teste de Fallback (Requisito de Avaliação)
 
 Para validar a resiliência: insira uma chave inválida propositalmente no nó do Gemini. O nó Code garantirá a resposta utilizando a lógica de contingência programada com os dados tratados anteriormente.
+
 
