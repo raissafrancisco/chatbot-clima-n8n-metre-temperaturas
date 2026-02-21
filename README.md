@@ -82,7 +82,7 @@ Utilize o arquivo docker-compose.yml fornecido.
 
 Após subir o worflow no n8n, configure os seguintes Tokens/ Keys na interface dos nós:
 
-- TELEGRAM_BOT_TOKEN: Configure a credencial do Telegram API, entre no nó **trigger do telegram, em "Credential to connect with" e clique em "create new credential" ou selecione uma existente. Lembre-se de selecionar a mesma credencial nos nós de resposta "send message" do telegram**. 
+- TELEGRAM_BOT_TOKEN: Configure a credencial do Telegram API, entre no nó **trigger do telegram, em "Credential to connect with" e clique em "create new credential" ou selecione uma existente, IMPORTANTE que a credencial contenha o token do bot gerado no botfather do telegram. Lembre-se de selecionar a mesma credencial do trigger nos nós de resposta "send message" do telegram**. 
 
 - OPENWEATHER_API_KEY: Insira a sua chave no nó **HTTP Request com o nome "chamada à openweather", a API Key deverá ser somada dentro do value do parâmetro appid**.
 
@@ -97,6 +97,7 @@ O que esperar: O bot responderá com a previsão no tom místico do Mestre ou so
 🧪 **Teste de Fallback (Requisito de Avaliação)**
 
 Para validar a resiliência: insira uma chave inválida propositalmente no nó do Gemini. O nó Code garantirá a resposta utilizando a lógica de contingência programada com os dados tratados anteriormente.
+
 
 
 
