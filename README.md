@@ -31,7 +31,7 @@ O bot possui uma personalidade única projetada para transformar uma simples con
 
 O workflow foi desenhado para ser blindado contra falhas:
 
-- Fallback Determinístico: Se a API de IA falhar, um nó Code (JavaScript) deteta o erro e ativa uma resposta fixa baseada nos dados reais da OpenWeather.
+- Fallback Determinístico: Se a API de IA falhar, um nó Code (JavaScript) detecta o erro e ativa uma resposta fixa baseada nos dados reais da OpenWeather.
 
 - Infraestrutura: O projeto inclui um arquivo docker-compose.yml para facilitar o deploy do n8n em ambientes containerizados.
 
@@ -76,7 +76,7 @@ Via Interface: No n8n, use a opção Import from File e selecione o arquivo json
 Se optar por rodar o ambiente localmente via Docker:
 Utilize o arquivo docker-compose.yml fornecido.
 
-⚠️ IMPORTANTE: Por questões de segurança, as credenciais no ficheiro estão marcadas como INSIRA_SUA_CHAVE_AQUI. É necessário editar o arquivo e inserir os seus próprios dados (tokens de banco de dados, chaves de criptografia e tokens do ngrok) antes de subir o contentor com docker-compose up -d.
+⚠️ IMPORTANTE: Por questões de segurança, as credenciais no arquivo estão marcadas como INSIRA_SUA_CHAVE_AQUI. É necessário editar o arquivo e inserir os seus próprios dados (tokens de banco de dados, chaves de criptografia, domínio e tokens do ngrok) antes de subir o conteúdo com docker-compose up -d.
 
 **3. Configurar Credenciais no n8n**
 
@@ -91,12 +91,13 @@ Após subir o worflow no n8n, configure os seguintes Tokens/ Keys na interface d
 ⚙️ **Como Executar o Chatbot**
 
 - Publicar: Clique no botão Publish para ativar o fluxo.
-- Enviar Mensagem: Envie o nome de uma cidade (Ex: Rio de Janeiro,RJ) para o seu bot no Telegram.
-O que esperar: O bot responderá com a previsão no tom místico do Mestre ou solicitará o formato correto em caso de erro.
+- Enviar Mensagem: Envie o nome de uma cidade e estado (Ex: Rio de Janeiro,RJ) para o seu bot no Telegram.
+O que esperar: O bot responderá com a previsão do tempo no tom místico do Mestre ou solicitará o formato correto em caso de erro.
 
 🧪 **Teste de Fallback (Requisito de Avaliação)**
 
-Para validar a resiliência: insira uma chave inválida propositalmente no nó do Gemini. O nó Code garantirá a resposta utilizando a lógica de contingência programada com os dados tratados anteriormente.
+Para validar a resiliência: insira uma chave inválida propositalmente no nó do Gemini. O nó Code garantirá a resposta utilizando a lógica de contingência programada com a mensagem determinística, utilziando os dados reais de temperatura da open weather tratados anteriormente.
+
 
 
 
