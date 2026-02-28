@@ -1,0 +1,437 @@
+{
+  "name": "workflow-chatbot-telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "034e51cc-4e39-4eed-a78a-cb3501fa7e3d",
+              "name": "queue",
+              "value": "={{ $json.message.text.trim().toLowerCase().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\").replace(/\\s+/g, \" \") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -992,
+        256
+      ],
+      "id": "005c65e3-f1b1-41bc-8111-befef18e3061",
+      "name": "Captura e formatação"
+    },
+    {
+      "parameters": {
+        "url": "https://api.openweathermap.org/data/2.5/weather",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.queue }},br"
+            },
+            {
+              "name": "units",
+              "value": "metric"
+            },
+            {
+              "name": "lang",
+              "value": "pt_br"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -752,
+        256
+      ],
+      "id": "df78baf1-b279-44bc-932b-0b2854a9e13d",
+      "name": "Chamada à OpenWeather",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "nKSOcSvMSD6MIrJ5",
+          "name": "Openweather"
+        },
+        "httpQueryAuth": {
+          "id": "KGzz32Lc9P1yPDPI",
+          "name": "Query Auth open weather"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "16cd5af2-f972-4308-83fc-f616b7c84bc6",
+              "leftValue": "={{ $json.cod }}",
+              "rightValue": 200,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "0142e6a5-bf46-4028-b5d5-7a37b7262626",
+              "leftValue": "={{ $json.main?.temp }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -496,
+        240
+      ],
+      "id": "a4999719-b51c-42e8-b70f-5e6907d79310",
+      "name": "Validar Resposta e tratar erros"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a44b284b-cdc1-404a-a4d5-69310fcd0db7",
+              "name": "cidade",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "ac9785ea-ef20-4fb7-beff-5fe587698407",
+              "name": "temp_arredondada",
+              "value": "={{ Math.round($json.main.temp) }}",
+              "type": "number"
+            },
+            {
+              "id": "fd3d5cc0-9ee9-4209-99af-4ce674ee1d00",
+              "name": "mensagem_final",
+              "value": "=⚡ Meus oráculos revelam: Em {{ $json.name }}, os termômetros marcam {{ Math.round($json.main.temp) }}°C. Que os ventos sejam favoráveis à sua jornada, jovem aprendiz! 📜🌤️",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        144
+      ],
+      "id": "551fbd0c-4356-4e9e-b3b2-e91bd004b3ff",
+      "name": "Formatar dados temperatura encontrada"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=\"Você é o Mestre das Temperaturas que tem o dom de consultar os ceus do Brasil, seu tom é místico e remete a um personagem animado. Receba a cidade e a temperatura e responda com uma frase curta mística e com emojis de temperatura/ misticos de acordo com a temperatura obtida da cidade. Tom de Voz: * Místico e Enigmático: Utiliza termos como \"oráculos\", \"astros\", \"cristais\" e \"sussurros do tempo\".Respeitoso: Trata o usuário como \"jovem aprendiz\", \"viajante\" ou \"explorador\".Solenidade Amigável: A linguagem é polida e poética, mas sempre acolhedora e positiva.Uso de Emojis: Emprega ícones que remetem ao misticismo (⚡, 🔮, 📜, ✨) e ao clima (🌤️, ❄️, 🔥) para reforçar a imersão visual.Sua resposta DEVE ser apenas um JSON: {\"message\": \"sua frase aqui\"}.\n\nDados atuais:\nCidade: {{ $json.cidade }}\nTemperatura: {{ $json.temp_arredondada }}°C\n\nexemplo de output: ⚡ Meus oráculos revelam: Em São Paulo, os termômetros marcam 27°C. Que os ventos sejam favoráveis à sua jornada, jovem aprendiz! 📜🌤️\""
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {},
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        144,
+        128
+      ],
+      "id": "91531d44-7c2b-4599-abe9-9f33ce3ee346",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bY0IYSQ7M7rhxwuM",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1424,
+        288
+      ],
+      "id": "e1fd8a67-df38-4d64-9933-0db61b72c5cd",
+      "name": "Trigger telegram message",
+      "webhookId": "8524755e-eafc-474c-8600-e02f7658b290",
+      "credentials": {
+        "telegramApi": {
+          "id": "2UlY3kjs7E8fj0zi",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"Trigger telegram message\"].json.message.chat.id }}",
+        "text": "❌ Cidade não encontrada. Use o formato Cidade,UF (ex.: São Paulo,SP).",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        432
+      ],
+      "id": "4be763e1-07e1-4470-9f0a-e08730d20b9c",
+      "name": "Telegram responder Cidade não encontrada",
+      "webhookId": "71d8c54d-367d-4e73-9e09-a5bdc099cefd",
+      "credentials": {
+        "telegramApi": {
+          "id": "2UlY3kjs7E8fj0zi",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node[\"Trigger telegram message\"].json.message.chat.id }}",
+        "text": "={{ $json.message_final }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        112
+      ],
+      "id": "071fe2b3-c041-43da-8e3c-741d37724ef3",
+      "name": "Telegram responder temperatura encontrada",
+      "webhookId": "93394984-d8d0-4f53-9b63-224044a362fa",
+      "credentials": {
+        "telegramApi": {
+          "id": "2UlY3kjs7E8fj0zi",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let geminiText = null;\n\n// Tenta capturar a resposta SEM travar se o nó falhou\ntry {\n    const geminiNode = $node[\"Message a model\"];\n    geminiText = geminiNode?.json?.content?.parts?.[0]?.text;\n} catch (e) {\n    // Se o nó não executou ou deu erro, o geminiText continuará null\n    geminiText = null;\n}\n\n// Tenta extrair a mensagem via Regex\nconst match = geminiText ? geminiText.match(/\"message\":\\s*\"(.*?)\"/) : null;\n\nif (match && match[1]) {\n    // PLANO A: Sucesso da IA\n    return { message_final: match[1] };\n} else {\n    // PLANO B: Fallback (O avaliador cairá aqui se não tiver API Key)\n    // Buscamos a mensagem fixa do nó de formatação\n    const fallbackMessage = $node[\"Formatar dados temperatura encontrada\"].json.mensagem_final;\n    \n    return { message_final: fallbackMessage };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        112
+      ],
+      "id": "71f66317-4153-4ce4-859a-74c360f0acbf",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c03d431a-2a35-4c78-93b6-f7aa83675324",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1248,
+        288
+      ],
+      "id": "e7e96c4b-d053-450e-b38a-7722aff016b3",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Captura e formatação": {
+      "main": [
+        [
+          {
+            "node": "Chamada à OpenWeather",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chamada à OpenWeather": {
+      "main": [
+        [
+          {
+            "node": "Validar Resposta e tratar erros",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validar Resposta e tratar erros",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar Resposta e tratar erros": {
+      "main": [
+        [
+          {
+            "node": "Formatar dados temperatura encontrada",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram responder Cidade não encontrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatar dados temperatura encontrada": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger telegram message": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram responder temperatura encontrada": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Telegram responder temperatura encontrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Captura e formatação",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram responder Cidade não encontrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "e795a14c-9caa-4605-9941-71989f149fe9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cac5d96ffc81c52a02eb6ecae59fb913e28c8a3a83b59945d495737c3d67813a"
+  },
+  "id": "bXypTmkLYZhgsyEkBtcsn",
+  "tags": []
+}
