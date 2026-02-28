@@ -82,9 +82,9 @@ Utilize o arquivo docker-compose.yml fornecido.
 
 Após subir o worflow no n8n, configure os seguintes Tokens/ Keys na interface dos nós:
 
-- TELEGRAM_BOT_TOKEN: Configure a credencial do Telegram API, entre no nó **trigger do telegram, em "Credential to connect with" e clique em "create new credential" ou selecione uma existente, IMPORTANTE que a credencial contenha o token do bot gerado no botfather do telegram. Lembre-se de selecionar a mesma credencial do trigger nos nós de resposta "send message" do telegram**. 
+- TELEGRAM_BOT_TOKEN: Configure a credencial do Telegram API, entre no nó trigger do telegram, em "Credential to connect with" e clique em "create new credential" ou selecione uma existente, IMPORTANTE que a credencial contenha o token do bot gerado no botfather do telegram. Lembre-se de selecionar a mesma credencial do trigger nos nós de resposta "send message" do telegram. 
 
-- OPENWEATHER_API_KEY: Insira a sua chave no nó **HTTP Request com o nome "chamada à openweather", a API Key deverá ser somada dentro do value do parâmetro appid**.
+- **OpenWeather (Query Auth): No nó "Chamada à OpenWeather", a autenticação deve estar definida como Query Auth.Crie uma nova credencial. O nome do parâmetro deve ser appid e o valor deve ser a sua chave de API.**
 
 - Google Gemini API: Configure a chave no nó Gemini em "Credential to connect with" e clique em "create new credential" ou selecione uma existente. Além disso revise se a configuração do nó se manteve como no json importado: dentro do nó em setting > On Error > a opção Continue (using error output). 
 
@@ -97,6 +97,7 @@ O que esperar: O bot responderá com a previsão do tempo no tom místico do Mes
 🧪 **Teste de Fallback (Requisito de Avaliação)**
 
 Para validar a resiliência: insira uma chave inválida propositalmente no nó do Gemini. O nó Code garantirá a resposta utilizando a lógica de contingência programada com a mensagem determinística, utilziando os dados reais de temperatura da open weather tratados anteriormente.
+
 
 
 
